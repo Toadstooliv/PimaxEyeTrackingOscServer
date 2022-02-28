@@ -23,6 +23,11 @@ namespace ASeeVROSCServer.ASeeVRInterface
             _movingAverageRightX = new SimpleMovingAverage(averageSteps);
             _movingAverageVert = new SimpleMovingAverage(averageSteps);
             _eyeTracker.OnUpdate += UpdateValues;
+            EyeTrackingHorizontalLeftAddress = "/avatar/parameters/LeftEyeX";
+            EyeTrackingHorizontalRightAddress = "/avatar/parameters/RightEyeX";
+            EyeTrackingVerticalAddress = "/avatar/parameters/EyesY";
+            EyeTrackingBlinkLeftAddress = "/avatar/parameters/LeftEyeBlink";
+            EyeTrackingBlinkRightAddress = "/avatar/parameters/RightEyeBlink";
 
         }
 
@@ -50,6 +55,16 @@ namespace ASeeVROSCServer.ASeeVRInterface
 
         #endregion
 
+        #region Public Properties
+
+        public string EyeTrackingHorizontalLeftAddress { get; set; }
+        public string EyeTrackingHorizontalRightAddress { get; set; }
+        public string EyeTrackingVerticalAddress { get; set; }
+        public string EyeTrackingBlinkLeftAddress { get; set; }
+        public string EyeTrackingBlinkRightAddress { get; set; }
+
+        #endregion
+
         #region Public Methods
 
         /// <summary>
@@ -72,10 +87,12 @@ namespace ASeeVROSCServer.ASeeVRInterface
 
             if(x_Left <= float.Epsilon && x_Right <= float.Epsilon)
             {
-                messages.Enqueue(new OscMessage("/avatar/parameters/Blink", 1));
+                messages.Enqueue(new OscMessage(EyeTrackingBlinkRightAddress, 1));
+                messages.Enqueue(new OscMessage(EyeTrackingBlinkLeftAddress, 1));
             } else
             {
-                messages.Enqueue(new OscMessage("/avatar/parameters/Blink", 0));
+                messages.Enqueue(new OscMessage(EyeTrackingBlinkRightAddress, 0));
+                messages.Enqueue(new OscMessage(EyeTrackingBlinkLeftAddress, 0));
             }
 
             normalizeAxes(ref x_Left, ref x_Right);
@@ -84,9 +101,9 @@ namespace ASeeVROSCServer.ASeeVRInterface
             y_combined = _movingAverageVert.Update(y_combined);
 
 
-            messages.Enqueue(new OscMessage("/avatar/parameters/EyeHorizontal_Left", x_Left*2));
-            messages.Enqueue(new OscMessage("/avatar/parameters/EyeHorizontal_Right", x_Right * 2));
-            messages.Enqueue(new OscMessage("/avatar/parameters/Eye", y_combined * 2));
+            messages.Enqueue(new OscMessage(EyeTrackingHorizontalLeftAddress, x_Left*2));
+            messages.Enqueue(new OscMessage(EyeTrackingHorizontalRightAddress, x_Right * 2));
+            messages.Enqueue(new OscMessage(EyeTrackingVerticalAddress, y_combined * 2));
 
             sendMessages(messages);
 
