@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "ASeeVROSCServer/1.0.0": {
+        "dependencies": {
+          "SharpOSC": "0.1.1.0"
+        },
+        "runtime": {
+          "ASeeVROSCServer.dll": {}
+        }
+      },
+      "SharpOSC/0.1.1.0": {
+        "runtime": {
+          "SharpOSC.dll": {
+            "assemblyVersion": "0.1.1.0",
+            "fileVersion": "0.1.1.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ASeeVROSCServer/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SharpOSC/0.1.1.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

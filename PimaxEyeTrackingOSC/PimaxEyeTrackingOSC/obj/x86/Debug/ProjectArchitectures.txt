@@ -1,0 +1,1 @@
+F:\VRChat\EyeTrackingOSCInterface\C#\PimaxEyeTrackingOSC\PimaxEyeTrackingOSC\PimaxEyeTrackingOSC.csproj;x86
