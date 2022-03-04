@@ -113,7 +113,7 @@ namespace ASeeVROSCServer.ASeeVRInterface
 
             // Add all messages to the queue
             messages.Enqueue(new OscMessage(EyeTrackingHorizontalLeftAddress, x_Left*2));
-            messages.Enqueue(new OscMessage(EyeTrackingVerticalAddress, (y_Left)));
+            messages.Enqueue(new OscMessage(EyeTrackingVerticalAddress, -(y_Left)));
             messages.Enqueue(new OscMessage(EyeTrackingHorizontalRightAddress, x_Right * 2));
 
 
