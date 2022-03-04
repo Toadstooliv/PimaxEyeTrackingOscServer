@@ -27,8 +27,8 @@ namespace ASeeVROSCServer.ASeeVRInterface
             EyeTrackingHorizontalLeftAddress = "/avatar/parameters/LeftX";
             EyeTrackingHorizontalRightAddress = "/avatar/parameters/RightX";
             EyeTrackingVerticalAddress = "/avatar/parameters/EyesY";
-            EyeTrackingBlinkLeftAddress = "/avatar/parameters/LeftEyeBlink";
-            EyeTrackingBlinkRightAddress = "/avatar/parameters/RightEyeBlink";
+            EyeTrackingBlinkLeftAddress = "/avatar/parameters/LeftEyeLid";
+            EyeTrackingBlinkRightAddress = "/avatar/parameters/RightEyeLid";
 
         }
 
@@ -92,12 +92,12 @@ namespace ASeeVROSCServer.ASeeVRInterface
             // Determine if we are blinking
             if(x_Left <= float.Epsilon && x_Right <= float.Epsilon)
             {
-                messages.Enqueue(new OscMessage(EyeTrackingBlinkRightAddress, 1));
-                messages.Enqueue(new OscMessage(EyeTrackingBlinkLeftAddress, 1));
-            } else
-            {
                 messages.Enqueue(new OscMessage(EyeTrackingBlinkRightAddress, 0));
                 messages.Enqueue(new OscMessage(EyeTrackingBlinkLeftAddress, 0));
+            } else
+            {
+                messages.Enqueue(new OscMessage(EyeTrackingBlinkRightAddress, 1));
+                messages.Enqueue(new OscMessage(EyeTrackingBlinkLeftAddress, 1));
             }
 
             y_Left = _movingAverageLeftY.Update(y_Left);
@@ -106,15 +106,16 @@ namespace ASeeVROSCServer.ASeeVRInterface
             // Normalize the axes from 0-1 to -1 to 1
             normalizeAxes(ref x_Left, ref x_Right);
             float y_combined = normalizeAxes(ref y_Left, ref y_Right);
+            Console.WriteLine(y_Left);
 
             // Add the new y value to its moving average
             //y_combined = _movingAverageVert.Update(y_combined);
-            Console.WriteLine(y_combined);
 
             // Add all messages to the queue
             messages.Enqueue(new OscMessage(EyeTrackingHorizontalLeftAddress, x_Left*2));
+            messages.Enqueue(new OscMessage(EyeTrackingVerticalAddress, (y_Left)));
             messages.Enqueue(new OscMessage(EyeTrackingHorizontalRightAddress, x_Right * 2));
-            messages.Enqueue(new OscMessage(EyeTrackingVerticalAddress, (y_combined * 50.0) - 1.0));
+
 
             sendMessages(messages);
         }
@@ -158,7 +159,7 @@ namespace ASeeVROSCServer.ASeeVRInterface
             {
                 left = left * 2.0f - 1.0f;
                 right = right * 2.0f - 1.0f;
-                return (left * right)/2;
+                return (left * right)/2f;
             }
         }
 
