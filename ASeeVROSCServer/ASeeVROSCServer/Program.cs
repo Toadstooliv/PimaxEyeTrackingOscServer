@@ -28,22 +28,26 @@ namespace ASeeVROSCServer
 
             runThread = true;
 
-            Thread thr = new Thread(new ThreadStart(Program.Runner));
+            Thread thr = new(new ThreadStart(Runner));
             thr.Start();
 
             Thread.Sleep(500);
-            Console.Write("Press any key to stop...");
+            Console.Write("Press any key to stop...\n");
 
             Console.ReadKey();
             runThread = false;
             eyeTracker.Stop();
-            
         }
 
         private static void Runner()
         {
             dataHandler = new ASeeVRDataHandler(eyeTracker, sender, 6, ConfigData);
-            while (runThread) ;
+            while (true)
+            {
+                if (!runThread) break;
+                Thread.Sleep(5000);
+            }
+            Console.WriteLine("Stopped");
         }
     }
 }
