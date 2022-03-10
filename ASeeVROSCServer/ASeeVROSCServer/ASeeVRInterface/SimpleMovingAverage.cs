@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ASeeVROSCServer.ASeeVRInterface
 {
@@ -14,7 +10,6 @@ namespace ASeeVROSCServer.ASeeVRInterface
         private int _index=0;
         private float _sum = 0;
         private int _count = 0;
-        private int _trail = 0;
         private int _totalBuffer = 0;
         private float _floatingSum = 0;
 

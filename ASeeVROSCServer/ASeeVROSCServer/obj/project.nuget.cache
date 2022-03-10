@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "90APXI5+B9UvPhvufeK4YkDE62HPY/r9IRM4zqkN7Stu5KDOTxWXGbbZquj5OlyjTDxlZYSV01BCLz7Wize7zw==",
+  "dgSpecHash": "MXAzICBuVSjKeHj0NH5J6lbR1kH57l7Ka6KdQuXYpsyB0Fg4NeNaM3x/PeTD9gHDTxgH2YtKUgWmEs1L+dQhpA==",
   "success": true,
   "projectFilePath": "F:\\VRChat\\EyeTrackingOSCInterface\\C#\\ASeeVROSCServer\\ASeeVROSCServer\\ASeeVROSCServer.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Aaron\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
+  ],
   "logs": []
 }

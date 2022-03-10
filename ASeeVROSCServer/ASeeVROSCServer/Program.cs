@@ -12,13 +12,16 @@ namespace ASeeVROSCServer
         static SharpOSC.UDPSender sender;
         static EyeTracker eyeTracker;
         static bool runThread;
+        static OSCEyeTracker ConfigData;
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
             sender = new SharpOSC.UDPSender("127.0.0.1", 9000);
 
             Console.WriteLine(System.IO.Directory.GetCurrentDirectory());
+            ConfigData = new OSCEyeTracker();
+            ConfigData.InitializeTrackingParams("config.json");
+
 
             eyeTracker = new EyeTracker();
             eyeTracker.Start();
@@ -39,7 +42,7 @@ namespace ASeeVROSCServer
 
         private static void Runner()
         {
-            dataHandler = new ASeeVRDataHandler(eyeTracker, sender, 6);
+            dataHandler = new ASeeVRDataHandler(eyeTracker, sender, 6, ConfigData);
             while (runThread) ;
         }
     }

@@ -1,0 +1,34 @@
+{	
+	"AverageSteps" : 6,
+	"MovingAverageBufferSize" : 10,
+	"MovementMultiplierX" : 2,
+	"MovementMultiplierY" : 10,
+	"EyeXLeftAddress" : "/avatar/parameters/LeftEyeX",
+    "EyeXRightAddress" : "/avatar/parameters/RightEyeX",
+    "EyeYAddress" : "/avatar/parameters/EyesY",
+	"EyeYLeftAddress" : "/avatar/parameters/LeftEyeY"
+	"EyeYRightAddress" : "/avatar/parameters/RightEyeY"
+    "EyeLidLeftAddress" : "/avatar/parameters/LeftEyeLid",
+    "EyeLidRightAddress" : "/avatar/parameters/RightEyeLid",
+	"xLeftRange" : 
+	{
+		"Max" : 1.0,
+		"Min" : 0.0
+	},
+	"xRightRange" : 
+	{
+		"Max" : 1.0,
+		"Min" : 0.0
+	},
+	"yLeftRange" : 
+	{
+		"Max" : 1.0,
+		"Min" : 0.0
+	},
+	"yRightRange" : 
+	{
+		"Max" : 1.0,
+		"Min" : 0.0
+	}
+}
+

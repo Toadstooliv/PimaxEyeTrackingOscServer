@@ -17,3 +17,4 @@ F:\VRChat\EyeTrackingOSCInterface\C#\ASeeVROSCServer\ASeeVROSCServer\obj\Debug\n
 F:\VRChat\EyeTrackingOSCInterface\C#\ASeeVROSCServer\ASeeVROSCServer\obj\Debug\net5.0\ref\ASeeVROSCServer.dll
 F:\VRChat\EyeTrackingOSCInterface\C#\ASeeVROSCServer\ASeeVROSCServer\obj\Debug\net5.0\ASeeVROSCServer.pdb
 F:\VRChat\EyeTrackingOSCInterface\C#\ASeeVROSCServer\ASeeVROSCServer\obj\Debug\net5.0\ASeeVROSCServer.genruntimeconfig.cache
+F:\VRChat\EyeTrackingOSCInterface\C#\ASeeVROSCServer\ASeeVROSCServer\bin\Debug\net5.0\Newtonsoft.Json.dll
