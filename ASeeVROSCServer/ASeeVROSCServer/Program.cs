@@ -3,6 +3,7 @@ using Pimax.EyeTracking;
 using System;
 using System.Threading;
 
+
 namespace ASeeVROSCServer
 {
     class Program
@@ -45,7 +46,7 @@ namespace ASeeVROSCServer
             while (true)
             {
                 if (!runThread) break;
-                Thread.Sleep(5000);
+                Thread.Sleep(1000);
             }
             Console.WriteLine("Stopped");
         }

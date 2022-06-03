@@ -68,10 +68,13 @@ namespace ASeeVROSCServer.ASeeVRInterface
             // Get the y eye components
             float y_Left = _eyeTracker.GetEyeParameter(_eyeTracker.LeftEye.Eye, EyeParameter.PupilCenterY);
             float y_Right = _eyeTracker.GetEyeParameter(_eyeTracker.RightEye.Eye, EyeParameter.PupilCenterY);
+            //Console.WriteLine(_eyeTracker.GetEyeParameter(_eyeTracker.LeftEye.Eye, EyeParameter.GazeX));
 
             // Add the new values to the moving average
             x_Left = ConfigData.MovingAverageLeftX.Update(x_Left);
             x_Right = ConfigData.MovingAverageRightX.Update(x_Right);
+
+            Console.WriteLine(_eyeTracker.GetEyeExpression(_eyeTracker.LeftEye.Eye, EyeExpression.PupilCenterX));
 
             // Determine if we are blinking
             if(x_Left <= float.Epsilon && x_Right <= float.Epsilon)
