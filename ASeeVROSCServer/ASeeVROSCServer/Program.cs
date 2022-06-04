@@ -21,7 +21,7 @@ namespace ASeeVROSCServer
 
             Console.WriteLine(System.IO.Directory.GetCurrentDirectory());
             ConfigData = new OSCEyeTracker();
-            ConfigData.InitializeTrackingParams("config.json");
+            ConfigData.InitializeTrackingParams("Config.json");
 
 
             eyeTracker = new EyeTracker();
@@ -42,7 +42,7 @@ namespace ASeeVROSCServer
 
         private static void Runner()
         {
-            dataHandler = new ASeeVRDataHandler(eyeTracker, sender, 6, ConfigData);
+            dataHandler = new ASeeVRDataHandler(eyeTracker, sender, ConfigData);
             while (true)
             {
                 if (!runThread) break;

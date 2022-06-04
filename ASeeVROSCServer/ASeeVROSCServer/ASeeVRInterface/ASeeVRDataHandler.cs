@@ -18,11 +18,9 @@ namespace ASeeVROSCServer.ASeeVRInterface
         /// </summary>
         /// <param name="eyeTracker">Eye tracker data source object.</param>
         /// <param name="oscSender">OSC sending object.</param>
-        /// <param name="averageSteps">Step count for the rolling average.</param>
         public ASeeVRDataHandler(
             EyeTracker eyeTracker,
             UDPSender oscSender,
-            int averageSteps,
             OSCEyeTracker configData
         )
         {
@@ -39,12 +37,12 @@ namespace ASeeVROSCServer.ASeeVRInterface
         /// <summary>
         /// Eye tracker object.
         /// </summary>
-        private EyeTracker _eyeTracker;
+        private readonly EyeTracker _eyeTracker;
 
         /// <summary>
         /// OSC Sender object.
         /// </summary>
-        UDPSender _oscSender;
+        private readonly UDPSender _oscSender;
 
         #endregion
 
@@ -57,6 +55,21 @@ namespace ASeeVROSCServer.ASeeVRInterface
 
         #endregion
 
+        #region Private Properties
+
+        /// <summary>
+        /// Store the previous good eye positions
+        /// </summary>
+        float lastGoodLeftX, lastGoodRightX, lastGoodLeftY, lastGoodRightY;
+
+        /// <summary>
+        /// Timers
+        /// </summary>
+        /// integers incrementing each frames under certain conditions to time stuff.
+        float blinkTimer, trackingLossTimerLeft, trackingLossTimerRight;
+
+        #endregion
+
         #region Public Methods
 
         /// <summary>
@@ -65,7 +78,8 @@ namespace ASeeVROSCServer.ASeeVRInterface
         public void UpdateValues()
         {
             Queue<OscMessage> messages = new Queue<OscMessage>();
-            // Get the X eye components
+
+            // Get the eyes' positions
             float x_Left = _eyeTracker.GetEyeParameter(
                 _eyeTracker.LeftEye.Eye,
                 EyeParameter.PupilCenterX
@@ -74,8 +88,6 @@ namespace ASeeVROSCServer.ASeeVRInterface
                 _eyeTracker.RightEye.Eye,
                 EyeParameter.PupilCenterX
             );
-
-            // Get the y eye components
             float y_Left = _eyeTracker.GetEyeParameter(
                 _eyeTracker.LeftEye.Eye,
                 EyeParameter.PupilCenterY
@@ -84,52 +96,124 @@ namespace ASeeVROSCServer.ASeeVRInterface
                 _eyeTracker.RightEye.Eye,
                 EyeParameter.PupilCenterY
             );
-            //Console.WriteLine(_eyeTracker.GetEyeParameter(_eyeTracker.LeftEye.Eye, EyeParameter.GazeX));
 
-            // Add the new values to the moving average
-            x_Left = ConfigData.MovingAverageLeftX.Update(x_Left);
-            x_Right = ConfigData.MovingAverageRightX.Update(x_Right);
+            // Check if the eyes lost tracking
+            bool lostTrackingLeft = x_Left == 0;
+            bool lostTrackingRight = x_Right == 0;
 
-            Console.WriteLine(
-                _eyeTracker.GetEyeExpression(_eyeTracker.LeftEye.Eye, EyeExpression.PupilCenterX)
-            );
-
-            // Determine if we are blinking
-            if (x_Left <= float.Epsilon && x_Right <= float.Epsilon)
+            // Blinking
+            if (lostTrackingLeft && lostTrackingRight)
             {
-                messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 0));
-                messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 0));
+                blinkTimer++;
+                if (blinkTimer >= ConfigData._blinkTime)
+                {
+                    messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 0));
+                    messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 0));
+                }
+                else
+                {
+                    messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
+                    messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
+                }
             }
             else
             {
+                blinkTimer = 0;
                 messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
                 messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
             }
 
-            // Place the Y values in their respective moving averages
+            // Eye positions when losing tracking
+            if (lostTrackingLeft)
+            {
+                trackingLossTimerLeft = 0;
+                if (!lostTrackingRight)
+                {
+                    x_Left = x_Right;
+                    y_Left = y_Right;
+                }
+                else
+                {
+                    x_Left = lastGoodLeftX;
+                    y_Left = lastGoodLeftY;
+                }
+            }
+            else
+            {
+                if (trackingLossTimerLeft < ConfigData._movingAverageBufferSize)
+                {
+                    trackingLossTimerLeft++;
+                    if (!lostTrackingRight)
+                    {
+                        x_Left = x_Right;
+                        y_Left = y_Right;
+                    }
+                    else
+                    {
+                        x_Left = lastGoodLeftX;
+                        y_Left = lastGoodLeftY;
+                    }
+                }
+                else
+                {
+                    lastGoodLeftX = x_Left;
+                    lastGoodLeftY = y_Left;
+                }
+            }
+
+            if (lostTrackingRight)
+            {
+                trackingLossTimerRight = 0;
+                if (!lostTrackingLeft)
+                {
+                    x_Right = x_Left;
+                    y_Right = y_Left;
+                }
+                else
+                {
+                    x_Right = lastGoodRightX;
+                    y_Right = lastGoodRightY;
+                }
+            }
+            else
+            {
+                if (trackingLossTimerRight < ConfigData._movingAverageBufferSize)
+                {
+                    trackingLossTimerRight++;
+                    if (!lostTrackingLeft)
+                    {
+                        x_Right = x_Left;
+                        y_Right = y_Left;
+                    }
+                    else
+                    {
+                        x_Right = lastGoodRightX;
+                        y_Right = lastGoodRightY;
+                    }
+                }
+                else
+                {
+                    lastGoodRightX = x_Right;
+                    lastGoodRightY = y_Right;
+                }
+            }
+
+            // Add the new values to the moving average
+            x_Left = ConfigData.MovingAverageLeftX.Update(x_Left);
+            x_Right = ConfigData.MovingAverageRightX.Update(x_Right);
             y_Left = ConfigData.MovingAverageLeftY.Update(y_Left);
             y_Right = ConfigData.MovingAverageRightY.Update(y_Right);
 
-            // Normalize the axes from 0-1 to -1 to 1
-            NormalizeAxes(ref x_Left, ref x_Right, ConfigData._xLeftRange);
-            float y_combined = NormalizeAxes(ref y_Left, ref y_Right, ConfigData._yLeftRange);
+            // Normalize the eye positions according to their ranges
+            x_Left = NormalizeFloatAroundZero(x_Left, ConfigData._xLeftRange);
+            x_Right = NormalizeFloatAroundZero(x_Right, ConfigData._xRightRange);
+            y_Left = NormalizeFloatAroundZero(y_Left, ConfigData._yLeftRange);
+            y_Right = NormalizeFloatAroundZero(y_Right, ConfigData._yRightRange);
 
             // Add all messages to the queue
-            messages.Enqueue(
-                new OscMessage(ConfigData.EyeXLeftAddress, x_Left * ConfigData._movementMultiplierX)
-            );
-            messages.Enqueue(
-                new OscMessage(
-                    ConfigData.EyeXRightAddress,
-                    x_Right * ConfigData._movementMultiplierX
-                )
-            );
-            messages.Enqueue(
-                new OscMessage(
-                    ConfigData.EyeYAddress,
-                    -(y_combined) * ConfigData._movementMultiplierY
-                )
-            );
+            messages.Enqueue(new OscMessage(ConfigData.EyeXLeftAddress, x_Left * ConfigData._movementMultiplierX));
+            messages.Enqueue(new OscMessage(ConfigData.EyeXRightAddress, x_Right * ConfigData._movementMultiplierX));
+            messages.Enqueue(new OscMessage(ConfigData.EyeYAddress, -(y_Left + y_Right / 2) * ConfigData._movementMultiplierY));
 
             SendMessages(messages);
         }
@@ -139,42 +223,14 @@ namespace ASeeVROSCServer.ASeeVRInterface
         #region Private Methods
 
         /// <summary>
-        /// Normalizes between two eye inputs and handles tracking loss per eye.  If either eye cannot be tracked,
-        /// tracking falls back to the other eye, if both eyes lose tracking both eyes go to center.
+        /// Normalizes <paramref name="input"/> that exists within range <paramref name="inputRange"/> to the range -1 to 1.
         /// </summary>
-        /// <param name="left">Left eye value.</param>
-        /// <param name="right">Right eye value.</param>
-        /// <returns>Returns an average of the two eyes or whichever is tracking.</returns>
-        private float NormalizeAxes(ref float left, ref float right, MinMaxRange inputRange)
+        /// <param name="input"></param>
+        /// <param name="inputRange"></param>
+        private static float NormalizeFloatAroundZero(float input, MinMaxRange inputRange)
         {
-            // If both eyes are lost center the view
-            if (left <= float.Epsilon && right <= float.Epsilon)
-            {
-                left = 0;
-                right = 0;
-                return 0;
-            }
-            // If the left eye has lost tracking, use the right eye's data
-            else if (left <= float.Epsilon)
-            {
-                right = NormalizeFloatAroundZero(right, inputRange);
-                left = right;
-                return right;
-            }
-            // If the right eye has lost tracking, use the left eye's data
-            else if (right <= float.Epsilon)
-            {
-                left = NormalizeFloatAroundZero(left, inputRange);
-                right = left;
-                return left;
-            }
-            // Otherwise normalize both eyes
-            else
-            {
-                left = NormalizeFloatAroundZero(left, inputRange);
-                right = NormalizeFloatAroundZero(right, inputRange);
-                return (left * right) / 2f;
-            }
+            float slope = 2 / (inputRange.Max - inputRange.Min);
+            return -1 + slope * (input - inputRange.Min);
         }
 
         /// <summary>
@@ -187,18 +243,6 @@ namespace ASeeVROSCServer.ASeeVRInterface
             {
                 _oscSender.Send(messages.Dequeue());
             }
-        }
-
-        /// <summary>
-        /// Normalizes <paramref name="input"/> that exists within range <paramref name="inputRange"/> to the range -1 to 1.
-        /// </summary>
-        /// <param name="input"></param>
-        /// <param name="inputRange"></param>
-        /// <returns></returns>
-        private static float NormalizeFloatAroundZero(float input, MinMaxRange inputRange)
-        {
-            float slope = 2 / (inputRange.Max - inputRange.Min);
-            return -1 + slope * (input - inputRange.Min);
         }
 
         #endregion

@@ -27,8 +27,8 @@ namespace ASeeVROSCServer.ASeeVRInterface.Utilites
         /// </summary>
         public MinMaxRange(JsonElement root)
         {
-            Max = (float)root.GetProperty("Max").GetDecimal();
-            Min = (float)root.GetProperty("Min").GetDecimal();
+            Max = (float)root.GetProperty("Max").GetDouble();
+            Min = (float)root.GetProperty("Min").GetDouble();
         }
     }
 }
