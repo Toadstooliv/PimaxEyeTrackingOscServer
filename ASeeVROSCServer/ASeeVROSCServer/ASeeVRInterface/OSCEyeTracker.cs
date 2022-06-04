@@ -18,8 +18,8 @@ namespace ASeeVROSCServer.ASeeVRInterface
         {
             _averageSteps = 6;
             _movingAverageBufferSize = 10;
-            _movementMultiplierX = 2;
-            _movementMultiplierY = 10;
+            _movementMultiplierX = 1;
+            _movementMultiplierY = 1;
             _xLeftRange = new MinMaxRange(0, 1);
             _xRightRange = new MinMaxRange(0, 1);
             _yLeftRange = new MinMaxRange(0, 1);
@@ -88,7 +88,7 @@ namespace ASeeVROSCServer.ASeeVRInterface
         /// Moving Average config.
         /// </summary>
         private int _averageSteps;
-        private int _movingAverageBufferSize;        
+        private int _movingAverageBufferSize;
 
         #endregion
 
