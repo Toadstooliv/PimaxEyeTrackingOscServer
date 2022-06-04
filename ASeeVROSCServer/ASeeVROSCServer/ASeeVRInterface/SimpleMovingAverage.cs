@@ -7,7 +7,7 @@ namespace ASeeVROSCServer.ASeeVRInterface
         private readonly int _k;
         private readonly float[] _values;
 
-        private int _index=0;
+        private int _index = 0;
         private float _sum = 0;
         private int _count = 0;
         private int _totalBuffer = 0;
@@ -16,7 +16,7 @@ namespace ASeeVROSCServer.ASeeVRInterface
         public SimpleMovingAverage(int k)
         {
             if (k <= 0) throw new ArgumentOutOfRangeException(nameof(k), "Must be greater than 0");
-            
+
             _k = k;
             _totalBuffer = 20;
             _values = new float[_k];
@@ -26,11 +26,11 @@ namespace ASeeVROSCServer.ASeeVRInterface
         {
             if (_count < _totalBuffer && nextInput > 0.00001f) _count++;
             else if (_count > 0 && nextInput < 0.00001f) _count--;
-            
+
             // calculate the new sum
             _sum = _sum - _values[_index] + nextInput;
-            if(_count==_totalBuffer)
-            _floatingSum = _sum;
+            if (_count == _totalBuffer)
+                _floatingSum = _sum;
 
             // overwrite the old value with the new one
             _values[_index] = nextInput;
@@ -39,7 +39,7 @@ namespace ASeeVROSCServer.ASeeVRInterface
             _index = (_index + 1) % (_k);
 
             // calculate the average
-            if (_sum/(float)_k <= .00001f || _count < _totalBuffer)
+            if (_sum / (float)_k <= .00001f || _count < _totalBuffer)
             {
                 //if(_count > _totalBuffer - _k)
                 //{
