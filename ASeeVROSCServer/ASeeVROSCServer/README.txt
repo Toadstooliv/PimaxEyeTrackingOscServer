@@ -15,6 +15,10 @@ The MovingAverageBufferSize config value determines how many good frames are req
 The BlinkTime config value determines how many frames your eyes need to be closed before it considers them as closed. Will avoid
 	your eyes closing when losing tracking with higher values but have a harder time detect your blinks. Defaults to 2. 
 	Good values are between 0 and 30.
+	
+The WinkTime config value determines how many frames one of your eye need to be closed before it considers it as closed.
+	Will greatly avoid your eyes closing when losing tracking with higher values but have a harder time detect your winks. 
+	Defaults to 50. Good values are between 2 and 100.
 
 
 There are two methods for configuring normalization:

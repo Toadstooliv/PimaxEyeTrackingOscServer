@@ -16,9 +16,10 @@ namespace ASeeVROSCServer.ASeeVRInterface
         /// </summary>
         public OSCEyeTracker()
         {
-            _averageSteps = 8;
+            _averageSteps = 10;
             _movingAverageBufferSize = 4;
-            _blinkTime = 6;
+            _blinkTime = 2;
+            _winkTime = 6;
             _movementMultiplierX = 1f;
             _movementMultiplierY = 1f;
             _xLeftRange = new MinMaxRange(0, 1);
@@ -78,9 +79,14 @@ namespace ASeeVROSCServer.ASeeVRInterface
         public int _movingAverageBufferSize;
 
         /// <summary>
-        /// Time to count full tracking loss as a blink.
+        /// Frames required to pass blinking as an actual blink.
         /// </summary>
         public int _blinkTime;
+
+        /// <summary>
+        /// Time to pass individual eye blinking as a wink
+        /// </summary>
+        public int _winkTime;
 
         #endregion
 
@@ -112,6 +118,7 @@ namespace ASeeVROSCServer.ASeeVRInterface
             _averageSteps = root.GetProperty("AverageSteps").GetInt32();
             _movingAverageBufferSize = root.GetProperty("MovingAverageBufferSize").GetInt32();
             _blinkTime = root.GetProperty("BlinkTime").GetInt32();
+            _winkTime = root.GetProperty("WinkTime").GetInt32();
             _movementMultiplierX = (float)root.GetProperty("MovementMultiplierX").GetDouble();
             _movementMultiplierY = (float)root.GetProperty("MovementMultiplierY").GetDouble();
             EyeXLeftAddress = root.GetProperty("EyeXLeftAddress").GetString();
