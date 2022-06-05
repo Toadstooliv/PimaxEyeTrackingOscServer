@@ -3,14 +3,17 @@
 Address Parameters should match the parameters on your avatar prefixed by "/avatar/parameters/", example config should work for 
 	VRCFT configured avatars.
 
-The Average steps config value determines how many frame iterations are kept in the average.  This affects smoothing, a higher
-	value will make the tracking less susceptible to bad data or noise but slower to track the eye between 2 and 20 seems to be
-	a good range
+The AverageSteps config value determines how many frame iterations are kept in the average.  This affects smoothing, a higher
+	value will make the tracking less susceptible to bad data or noise but slower to track the eye. Between 2 and 20 is a good
+	good range
 
-The moving average buffer size config value determines how many good frames are required to pass tracking data as valid.  As an
-	example: It defaults to 10 this means that if there is a bad frame, for the next 10 frames it will be treated as not tracking
+The MovingAverageBufferSize config value determines how many good frames are required to pass tracking data as valid.  As an
+	example: It defaults to 4 this means that if there is a bad frame, for the next 4 frames it will be treated as not tracking
 	the eye.  The purpose of this value to filter out situations where the eye tracker loses tracking and starts creating false 
-	tracks, as these false tracks tend to not be consistent tracking blocks.  Good values are between 0 and 50.
+	tracks, as these false tracks tend to not be consistent tracking blocks.  Good values are between 0 and 40.
+
+The BlinkTime config value determines how many frames your eyes need to be closed before it considers them as closed. Defaults
+	to 4. Good values are between 0 and 100.
 
 
 There are two methods for configuring normalization:
@@ -29,4 +32,3 @@ The next plans for this application are to implement a UI and wizard that allows
 Note: for those who are more programming savvy, included with the project is an implementation of the 1Euro eye tracking smoothing
 	algorithm.  I haven't done testing to detemine if it is more effective than a simple moving average as I have implemented. If
 	you decide to test it out and find it preferable please let me know!
-

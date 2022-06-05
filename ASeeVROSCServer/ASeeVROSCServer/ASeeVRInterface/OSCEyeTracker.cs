@@ -16,14 +16,15 @@ namespace ASeeVROSCServer.ASeeVRInterface
         /// </summary>
         public OSCEyeTracker()
         {
-            _averageSteps = 6;
-            _movingAverageBufferSize = 10;
-            _movementMultiplierX = 1;
-            _movementMultiplierY = 1;
+            _averageSteps = 8;
+            _movingAverageBufferSize = 4;
+            _blinkTime = 6;
+            _movementMultiplierX = 1f;
+            _movementMultiplierY = 1f;
             _xLeftRange = new MinMaxRange(0, 1);
             _xRightRange = new MinMaxRange(0, 1);
             _yLeftRange = new MinMaxRange(0, 1);
-            _xRightRange = new MinMaxRange(0, 1);
+            _yRightRange = new MinMaxRange(0, 1);
         }
 
         #endregion
@@ -63,8 +64,23 @@ namespace ASeeVROSCServer.ASeeVRInterface
         /// <summary>
         /// Eye Tracking Multipliers.
         /// </summary>
-        public int _movementMultiplierX { get; private set; }
-        public int _movementMultiplierY { get; private set; }
+        public float _movementMultiplierX { get; private set; }
+        public float _movementMultiplierY { get; private set; }
+
+        /// <summary>
+        /// Step count for the rolling average
+        /// </summary>
+        public int _averageSteps;
+
+        /// <summary>
+        /// Frames ignored after losing tracking.
+        /// </summary>
+        public int _movingAverageBufferSize;
+
+        /// <summary>
+        /// Time to count full tracking loss as a blink.
+        /// </summary>
+        public int _blinkTime;
 
         #endregion
 
@@ -82,16 +98,6 @@ namespace ASeeVROSCServer.ASeeVRInterface
 
         #endregion
 
-        #region Private Properties
-
-        /// <summary>
-        /// Moving Average config.
-        /// </summary>
-        private int _averageSteps;
-        private int _movingAverageBufferSize;
-
-        #endregion
-
         #region Public Methods
 
         /// <summary>
@@ -105,8 +111,9 @@ namespace ASeeVROSCServer.ASeeVRInterface
             JsonElement root = doc.RootElement;
             _averageSteps = root.GetProperty("AverageSteps").GetInt32();
             _movingAverageBufferSize = root.GetProperty("MovingAverageBufferSize").GetInt32();
-            _movementMultiplierX = root.GetProperty("MovementMultiplierX").GetInt32();
-            _movementMultiplierY = root.GetProperty("MovementMultiplierY").GetInt32();
+            _blinkTime = root.GetProperty("BlinkTime").GetInt32();
+            _movementMultiplierX = (float)root.GetProperty("MovementMultiplierX").GetDouble();
+            _movementMultiplierY = (float)root.GetProperty("MovementMultiplierY").GetDouble();
             EyeXLeftAddress = root.GetProperty("EyeXLeftAddress").GetString();
             EyeXRightAddress = root.GetProperty("EyeXRightAddress").GetString();
             EyeYLeftAddress = root.GetProperty("EyeYLeftAddress").GetString();
