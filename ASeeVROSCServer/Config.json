@@ -1,7 +1,7 @@
 {
-  "AverageSteps": 8,
+  "AverageSteps": 10,
   "MovingAverageBufferSize": 4,
-  "BlinkTime": 4,
+  "BlinkTime": 2,
   "MovementMultiplierX": 1.0,
   "MovementMultiplierY": 1.0,
   "EyeXLeftAddress": "/avatar/parameters/LeftEyeX",

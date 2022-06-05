@@ -79,7 +79,7 @@ namespace ASeeVROSCServer.ASeeVRInterface
         {
             Queue<OscMessage> messages = new Queue<OscMessage>();
 
-            // Get the eyes' positions
+            // Get the eyes' components
             float x_Left = _eyeTracker.GetEyeParameter(
                 _eyeTracker.LeftEye.Eye,
                 EyeParameter.PupilCenterX
@@ -96,34 +96,21 @@ namespace ASeeVROSCServer.ASeeVRInterface
                 _eyeTracker.RightEye.Eye,
                 EyeParameter.PupilCenterY
             );
+            float blink_Left = _eyeTracker.GetEyeExpression(
+                _eyeTracker.LeftEye.Eye,
+                EyeExpression.Blink
+            );
+            float blink_Right = _eyeTracker.GetEyeExpression(
+                _eyeTracker.RightEye.Eye,
+                EyeExpression.Blink
+            );
+
 
             // Check if the eyes lost tracking
             bool lostTrackingLeft = x_Left == 0;
             bool lostTrackingRight = x_Right == 0;
 
-            // Blinking
-            if (lostTrackingLeft && lostTrackingRight)
-            {
-                blinkTimer++;
-                if (blinkTimer >= ConfigData._blinkTime)
-                {
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 0));
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 0));
-                }
-                else
-                {
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
-                }
-            }
-            else
-            {
-                blinkTimer = 0;
-                messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
-                messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
-            }
-
-            // Eye positions when losing tracking
+            // Handle eyes when losing tracking
             if (lostTrackingLeft)
             {
                 trackingLossTimerLeft = 0;
@@ -196,6 +183,28 @@ namespace ASeeVROSCServer.ASeeVRInterface
                     lastGoodRightX = x_Right;
                     lastGoodRightY = y_Right;
                 }
+            }
+
+            // Handle blinking
+            if (blink_Left == 1 && blink_Right == 1)
+            {
+                blinkTimer++;
+                if (blinkTimer >= ConfigData._blinkTime)
+                {
+                    messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 0));
+                    messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 0));
+                }
+                else
+                {
+                    messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
+                    messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
+                }
+            }
+            else
+            {
+                blinkTimer = 0;
+                messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
+                messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
             }
 
             // Add the new values to the moving average
