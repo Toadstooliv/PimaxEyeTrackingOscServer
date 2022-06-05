@@ -2,7 +2,7 @@
   "AverageSteps": 10,
   "MovingAverageBufferSize": 4,
   "BlinkTime": 2,
-  "WinkTime": 50,
+  "WinkTime": 200,
   "MovementMultiplierX": 1.0,
   "MovementMultiplierY": 1.0,
   "EyeXLeftAddress": "/avatar/parameters/LeftEyeX",

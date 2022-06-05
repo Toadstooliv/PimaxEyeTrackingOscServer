@@ -106,6 +106,7 @@ namespace ASeeVROSCServer.ASeeVRInterface
                 EyeExpression.Blink
             );
 
+            #region Tracking loss
             // Check if the eyes lost tracking
             bool lostTrackingLeft = x_Left == 0;
             bool lostTrackingRight = x_Right == 0;
@@ -184,107 +185,61 @@ namespace ASeeVROSCServer.ASeeVRInterface
                     lastGoodRightY = y_Right;
                 }
             }
+            #endregion
 
-            // Handle blinking
+            #region Handle blinking
+            int lidLeft = 1, lidRight = 1;
             if (blink_Left == 1 && blink_Right == 1)
             {
                 blinkTimerCombined++;
                 blinkTimerLeft++;
                 blinkTimerRight++;
+
                 if (blinkTimerCombined >= ConfigData._blinkTime)
                 {
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 0));
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 0));
-                }
-                else if (blink_Left == 1 || blink_Right == 1)
-                {
-                    if (blink_Left == 1)
-                    {
-                        blinkTimerLeft++;
-                        if (blinkTimerLeft >= ConfigData._winkTime)
-                        {
-                            messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 0));
-                        }
-                        else
-                        {
-                            messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
-                        }
-                    }
-                    else
-                    {
-                        blinkTimerLeft = 0;
-                        messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
-                    }
-                    if (blink_Right == 1)
-                    {
-                        blinkTimerRight++;
-                        if (blinkTimerRight >= ConfigData._winkTime)
-                        {
-                            messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 0));
-                        }
-                        else
-                        {
-                            messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
-                        }
-                    }
-                    else
-                    {
-                        blinkTimerRight = 0;
-                        messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
-                    }
-                }
-                else
-                {
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
+                    lidLeft = 0;
+                    lidRight = 0;
                 }
             }
-            else if (blink_Left == 1 || blink_Right == 1)
+            if (blink_Left == 1 || blink_Right == 1)
             {
-                blinkTimerCombined = 0;
                 if (blink_Left == 1)
                 {
                     blinkTimerLeft++;
+
                     if (blinkTimerLeft >= ConfigData._winkTime)
                     {
-                        messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 0));
-                    }
-                    else
-                    {
-                        messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
+                        lidLeft = 0;
                     }
                 }
                 else
                 {
                     blinkTimerLeft = 0;
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
                 }
                 if (blink_Right == 1)
                 {
                     blinkTimerRight++;
+
                     if (blinkTimerRight >= ConfigData._winkTime)
                     {
-                        messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 0));
-                    }
-                    else
-                    {
-                        messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
+                        lidRight = 0;
                     }
                 }
                 else
                 {
                     blinkTimerRight = 0;
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
                 }
             }
-            else
+            if (blink_Left == 0 && blink_Right == 0)
             {
                 blinkTimerCombined = 0;
                 blinkTimerLeft = 0;
                 blinkTimerRight = 0;
-                messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
-                messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
             }
+
+            messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, lidLeft));
+            messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, lidRight));
+            #endregion
 
             // Add the new values to the moving average
             x_Left = ConfigData.MovingAverageLeftX.Update(x_Left);
