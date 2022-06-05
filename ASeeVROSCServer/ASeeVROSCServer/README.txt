@@ -4,16 +4,21 @@ Address Parameters should match the parameters on your avatar prefixed by "/avat
 	VRCFT configured avatars.
 
 The AverageSteps config value determines how many frame iterations are kept in the average.  This affects smoothing, a higher
-	value will make the tracking less susceptible to bad data or noise but slower to track the eye. Between 2 and 20 is a good
-	good range
+	value will make the tracking less susceptible to bad data or noise but slower to track the eye. Defaults to 10.
+	Good values are between 2 and 20.
 
 The MovingAverageBufferSize config value determines how many good frames are required to pass tracking data as valid.  As an
 	example: It defaults to 4 this means that if there is a bad frame, for the next 4 frames it will be treated as not tracking
 	the eye.  The purpose of this value to filter out situations where the eye tracker loses tracking and starts creating false 
 	tracks, as these false tracks tend to not be consistent tracking blocks.  Good values are between 0 and 40.
 
-The BlinkTime config value determines how many frames your eyes need to be closed before it considers them as closed. Defaults
-	to 4. Good values are between 0 and 100.
+The BlinkTime config value determines how many frames your eyes need to be closed before it considers them as closed. Will avoid
+	your eyes closing when losing tracking with higher values but have a harder time detect your blinks. Defaults to 2. 
+	Good values are between 0 and 30.
+	
+The WinkTime config value determines how many frames one of your eye need to be closed before it considers it as closed.
+	Will greatly avoid your eyes closing when losing tracking with higher values but have a harder time detect your winks. 
+	Defaults to 200. Good values are between 2 and 10000 (to disable winking).
 
 
 There are two methods for configuring normalization:

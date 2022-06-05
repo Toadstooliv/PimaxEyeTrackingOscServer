@@ -66,7 +66,8 @@ namespace ASeeVROSCServer.ASeeVRInterface
         /// Timers
         /// </summary>
         /// integers incrementing each frames under certain conditions to time stuff.
-        float blinkTimer, trackingLossTimerLeft, trackingLossTimerRight;
+        int blinkTimerCombined, blinkTimerLeft, blinkTimerRight;
+        int trackingLossTimerLeft, trackingLossTimerRight;
 
         #endregion
 
@@ -79,7 +80,7 @@ namespace ASeeVROSCServer.ASeeVRInterface
         {
             Queue<OscMessage> messages = new Queue<OscMessage>();
 
-            // Get the eyes' positions
+            // Get the eyes' components
             float x_Left = _eyeTracker.GetEyeParameter(
                 _eyeTracker.LeftEye.Eye,
                 EyeParameter.PupilCenterX
@@ -96,34 +97,21 @@ namespace ASeeVROSCServer.ASeeVRInterface
                 _eyeTracker.RightEye.Eye,
                 EyeParameter.PupilCenterY
             );
+            float blink_Left = _eyeTracker.GetEyeExpression(
+                _eyeTracker.LeftEye.Eye,
+                EyeExpression.Blink
+            );
+            float blink_Right = _eyeTracker.GetEyeExpression(
+                _eyeTracker.RightEye.Eye,
+                EyeExpression.Blink
+            );
 
+            #region Tracking loss
             // Check if the eyes lost tracking
             bool lostTrackingLeft = x_Left == 0;
             bool lostTrackingRight = x_Right == 0;
 
-            // Blinking
-            if (lostTrackingLeft && lostTrackingRight)
-            {
-                blinkTimer++;
-                if (blinkTimer >= ConfigData._blinkTime)
-                {
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 0));
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 0));
-                }
-                else
-                {
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
-                    messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
-                }
-            }
-            else
-            {
-                blinkTimer = 0;
-                messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, 1));
-                messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, 1));
-            }
-
-            // Eye positions when losing tracking
+            // Handle eyes when losing tracking
             if (lostTrackingLeft)
             {
                 trackingLossTimerLeft = 0;
@@ -197,6 +185,61 @@ namespace ASeeVROSCServer.ASeeVRInterface
                     lastGoodRightY = y_Right;
                 }
             }
+            #endregion
+
+            #region Handle blinking
+            int lidLeft = 1, lidRight = 1;
+            if (blink_Left == 1 && blink_Right == 1)
+            {
+                blinkTimerCombined++;
+                blinkTimerLeft++;
+                blinkTimerRight++;
+
+                if (blinkTimerCombined >= ConfigData._blinkTime)
+                {
+                    lidLeft = 0;
+                    lidRight = 0;
+                }
+            }
+            if (blink_Left == 1 || blink_Right == 1)
+            {
+                if (blink_Left == 1)
+                {
+                    blinkTimerLeft++;
+
+                    if (blinkTimerLeft >= ConfigData._winkTime)
+                    {
+                        lidLeft = 0;
+                    }
+                }
+                else
+                {
+                    blinkTimerLeft = 0;
+                }
+                if (blink_Right == 1)
+                {
+                    blinkTimerRight++;
+
+                    if (blinkTimerRight >= ConfigData._winkTime)
+                    {
+                        lidRight = 0;
+                    }
+                }
+                else
+                {
+                    blinkTimerRight = 0;
+                }
+            }
+            if (blink_Left == 0 && blink_Right == 0)
+            {
+                blinkTimerCombined = 0;
+                blinkTimerLeft = 0;
+                blinkTimerRight = 0;
+            }
+
+            messages.Enqueue(new OscMessage(ConfigData.EyeLidLeftAddress, lidLeft));
+            messages.Enqueue(new OscMessage(ConfigData.EyeLidRightAddress, lidRight));
+            #endregion
 
             // Add the new values to the moving average
             x_Left = ConfigData.MovingAverageLeftX.Update(x_Left);
