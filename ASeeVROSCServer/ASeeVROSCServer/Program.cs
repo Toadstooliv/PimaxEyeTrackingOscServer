@@ -42,11 +42,13 @@ namespace ASeeVROSCServer
                 {
                     runThread = false;
                     eyeTracker.Stop();
+                    break;
                 }
                 else if (input.KeyChar == char.Parse("c"))
                 {
                     calibrate = true;
                 }
+                Thread.Sleep(100);
             }
         }
 

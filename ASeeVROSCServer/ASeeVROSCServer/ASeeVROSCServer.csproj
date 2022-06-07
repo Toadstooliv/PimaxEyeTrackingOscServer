@@ -1,10 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	<PublishSingleFile>true</PublishSingleFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath></OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,5 +27,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy /y &quot;$(ProjectDir)ConfigFile\Config.json&quot; &quot;$(ProjectDir)$(OutDir)&quot;&#xD;&#xA;copy /y &quot;$(ProjectDir)ASeeVRInterface\PimaxEyeTracker.dll&quot; &quot;$(ProjectDir)$(OutDir)&quot;&#xD;&#xA;copy /y &quot;$(ProjectDir)ASeeVRInterface\aSeeVRClient.dll&quot; &quot;$(ProjectDir)$(OutDir)&quot;&#xD;&#xA;&#xD;&#xA;mkdir &quot;$(ProjectDir)\bin\Release\publish&quot;&#xD;&#xA;copy /y &quot;$(ProjectDir)ConfigFile\Config.json&quot; &quot;$(ProjectDir)\bin\Release\publish\&quot;&#xD;&#xA;copy /y &quot;$(ProjectDir)ASeeVRInterface\PimaxEyeTracker.dll&quot; &quot;$(ProjectDir)\bin\Release\publish\&quot;&#xD;&#xA;copy /y &quot;$(ProjectDir)ASeeVRInterface\aSeeVRClient.dll&quot; &quot;$(ProjectDir)\bin\Release\publish\&quot;" />
+  </Target>
 
 </Project>
