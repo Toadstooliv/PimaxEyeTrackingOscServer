@@ -69,6 +69,11 @@ namespace ASeeVROSCServer.ASeeVRInterface
         int blinkTimerCombined, blinkTimerLeft, blinkTimerRight;
         int trackingLossTimerLeft, trackingLossTimerRight;
 
+        /// <summary>
+        /// Calibration offsets
+        /// </summary>
+        float offsetLeftX, offsetLeftY, offsetRightX, offsetRightY;
+
         #endregion
 
         #region Public Methods
@@ -110,6 +115,11 @@ namespace ASeeVROSCServer.ASeeVRInterface
             // Check if the eyes lost tracking
             bool lostTrackingLeft = x_Left == 0;
             bool lostTrackingRight = x_Right == 0;
+
+            x_Left += offsetLeftX;
+            x_Right += offsetRightX;
+            y_Left += offsetLeftY;
+            y_Right += offsetRightY;
 
             // Handle eyes when losing tracking
             if (lostTrackingLeft)
@@ -259,6 +269,38 @@ namespace ASeeVROSCServer.ASeeVRInterface
             messages.Enqueue(new OscMessage(ConfigData.EyeYAddress, -(y_Left + y_Right / 2) * ConfigData._movementMultiplierY));
 
             SendMessages(messages);
+        }
+
+        /// <summary>
+        /// Calculates the eye offsets from 0
+        /// </summary>
+        public void Calibrate()
+        {
+            // Get the eyes' components
+            float x_Left = _eyeTracker.GetEyeParameter(
+                _eyeTracker.LeftEye.Eye,
+                EyeParameter.PupilCenterX
+            );
+            float x_Right = _eyeTracker.GetEyeParameter(
+                _eyeTracker.RightEye.Eye,
+                EyeParameter.PupilCenterX
+            );
+            float y_Left = _eyeTracker.GetEyeParameter(
+                _eyeTracker.LeftEye.Eye,
+                EyeParameter.PupilCenterY
+            );
+            float y_Right = _eyeTracker.GetEyeParameter(
+                _eyeTracker.RightEye.Eye,
+                EyeParameter.PupilCenterY
+            );
+            
+            // assigns offsets
+            offsetLeftX = 0.5f - x_Left;
+            offsetRightX = 0.5f - x_Right;
+            offsetLeftY = 0.5f - y_Left;
+            offsetRightY = 0.5f - y_Right;
+
+            Console.WriteLine(" Calibrated successfully!");
         }
 
         #endregion
