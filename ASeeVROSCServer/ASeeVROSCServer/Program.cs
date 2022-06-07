@@ -12,7 +12,7 @@ namespace ASeeVROSCServer
         static ASeeVRDataHandler dataHandler;
         static SharpOSC.UDPSender sender;
         static EyeTracker eyeTracker;
-        static bool runThread;
+        static bool runThread, calibrate;
         static OSCEyeTracker ConfigData;
 
         static void Main(string[] args)
@@ -33,11 +33,21 @@ namespace ASeeVROSCServer
             thr.Start();
 
             Thread.Sleep(500);
-            Console.Write("Press any key to stop...\n");
+            Console.Write("Press S to stop or C to calibrate...\n");
 
-            Console.ReadKey();
-            runThread = false;
-            eyeTracker.Stop();
+            while (true)
+            {
+                ConsoleKeyInfo input = Console.ReadKey();
+                if (input.KeyChar == char.Parse("s"))
+                {
+                    runThread = false;
+                    eyeTracker.Stop();
+                }
+                else if (input.KeyChar == char.Parse("c"))
+                {
+                    calibrate = true;
+                }
+            }
         }
 
         private static void Runner()
@@ -46,9 +56,14 @@ namespace ASeeVROSCServer
             while (true)
             {
                 if (!runThread) break;
-                Thread.Sleep(1000);
+                if (calibrate)
+                {
+                    calibrate = false;
+                    dataHandler.Calibrate();
+                }
+                Thread.Sleep(500);
             }
-            Console.WriteLine("Stopped");
+            Console.WriteLine(" Stopped successfully.");
         }
     }
 }
